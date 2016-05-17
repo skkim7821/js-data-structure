@@ -1,24 +1,29 @@
-function defineClass(...args) {
+// function defineClass(...args) {
 
-	const currIdx = args.length - 1;
+// 	const currIdx = args.length - 1;
 
-	return function() {
-		for (let i = 0; i < args.length; i++) {
-			for (let v in args[i]) {
-				if (v !== 'static') {
-					this[v] = args[i][v];
-				}
-				if (v === 'static' && i === currIdx) {
-					this[v] = args[i][v];	
-				}
-			}
-		}
-		if (this.init) this.init();
-	}
+// 	return function() {
+// 		for (let i = 0; i < args.length; i++) {
+// 			for (let v in args[i]) {
+// 				if (v !== 'static') {
+// 					this[v] = args[i][v];
+// 				}
+// 				if (v === 'static' && i === currIdx) {
+// 					this[v] = args[i][v];	
+// 				}
+// 			}
+// 		}
+// 		if (this.init) this.init();
+// 	}
+
+// }
+// 
+
+function defineClass() {
 
 }
 
-var opt = {
+var Parent = defineClass({
 	attr: 'hello world', 
 	init: function() {
 		this.name = 'what the fuck';
@@ -40,19 +45,18 @@ var opt = {
 			return 'this is static method5'
 		}
 	}
-}
+});
 
-var opt2 = {
+var Child = defineClass(Parent, {
 	method4: function() {
 		return 'what is method4?';
 	},
 	method5: function() {
 		return 'what is method5?';
 	}
-}
+})
 
-var Parent = defineClass(opt);
-var Child = defineClass(opt, opt2);
+
 var parentInstance = new Parent();
 var childInstance = new Child();
 
