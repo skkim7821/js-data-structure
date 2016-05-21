@@ -85,25 +85,32 @@ BST.prototype = {
 			return (parent.left != null) && (parent.left.data === data) ? 
 							'left' : 'right'; 
 		})();
-		
+		console.log('removeNode: ' + this.removeNode(this.root, data));
 		console.log(parent);
 	},
 	removeNode: function(n, data) {
+		if (n == null) {
+			return null;
+		}
 
-		if (n === null) return null;
-
-		if (data === n.data) {
-			if (n.left === null && n.right === null) return null;
-			if (n.left === null) return n.right;
-			if (n.right === null) {
-				return n.left;
+		var ret = null;
+		if (data == n.data) {
+			if (n.left == null && n.right == null) {
+				return null;
+			} 
+			if (n.left == null) {
+				return n.right;
 			}
-
+			if (n.right == null) {
+				return n.left; 	
+			}
 		} else if (data < n.data) {
 			this.removeNode(n.left, data);
 		} else {
 			this.removeNode(n.right, data);
 		}
+
+		// return ret;
 	}
 };
 
@@ -115,7 +122,7 @@ function inOrder(node) {
 	}
 };
 
-let nums = BST.of();
+var nums = BST.of();
 nums.insert(50); 
 nums.insert(48); 
 nums.insert(80); 
