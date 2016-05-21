@@ -1,3 +1,14 @@
+Array.prototype.shuffle = function() {
+	var a = this;
+  var j, x, i;
+  for (i = a.length; i; i--) {
+    j = Math.floor(Math.random() * i);
+    x = a[i - 1];
+    a[i - 1] = a[j];
+    a[j] = x;
+  }
+};
+
 function Node(data, left, right) {
 	this.data = data;
 	this.left = left;
@@ -11,12 +22,16 @@ Node.of = function(data, left, right) {
 	return new Node(data, left, right);
 };
 
-function BST() {
+function BST(arr) {
 	this.root = null;
+
+	if ((arr instanceof Array) && arr.length > 0 ) {
+		this.build(arr);
+	}
 }
 
-BST.of = function() {
-	return new BST();
+BST.of = function(arr) {
+	return new BST(arr);
 };
 
 BST.prototype = {
@@ -32,6 +47,23 @@ BST.prototype = {
 			t.right === null ? t.right = n : this.checkAndInsert(n, t.right);
 		}
 	},
+	build: function(arr) {
+		arr = arr.sort(function(a, b) { 
+			return a - b;
+		});
+		var median = this.getMedian(arr),
+				idx = arr.indexOf(median),
+				lefts = arr.slice(0, idx),
+				rights = arr.slice(idx+1);
+
+		this.insert(median);
+		lefts.reverse().forEach((item) => {
+			this.insert(item);
+		});
+		rights.reverse().forEach((item) =>{
+			this.insert(item);
+		});
+	},
 	find: function(data) {
 		var x = this.root;
 		while (x.data !== data) {
@@ -39,16 +71,6 @@ BST.prototype = {
 			if (x === null) return null;
 		}
 		return x;
-	},
-	findParent: function(data) {
-		var x = this.root;
-		var parent;
-		while(x.data !== data) {
-			parent = x;
-			data < x.data ? x = x.left : x = x.right;
-			if (x === null) return null;
-		}
-		return parent;
 	},
 	getMin: function() {
 		var x = this.root;
@@ -64,86 +86,88 @@ BST.prototype = {
 		}
 		return x.data;
 	},
+	getMedian: function(arr) {
+		var len = arr.length;
+		if (len % 2 == 0) return arr[len / 2];
+		return arr[(len - 1) / 2];
+	},
 	remove: function(data) {
-		var parent = this.findParent(data);
-		var side = (function() {
-			return (parent.left != null) && (parent.left.data === data) ? 
-							'left' : 'right'; 
-		})();
-		var t = parent[side];
-
-		if (t.left === null && t.right === null) parent[side] = null;
-		if (t.left === null) parent[side] = t.right;
-		if (t.right === null) parent[side] = t.left;
-
-		
-
+		this.root = this.removeNode(this.root, data);
 	},
-	remove2: function(data) {
-		var parent = this.findParent(data);
-		var side = (function() {
-			return (parent.left != null) && (parent.left.data === data) ? 
-							'left' : 'right'; 
-		})();
-		console.log('removeNode: ' + this.removeNode(this.root, data));
-		console.log(parent);
-	},
-	removeNode: function(n, data) {
-		if (n == null) {
-			return null;
-		}
+	removeNode: function(node, data) {
 
-		var ret = null;
-		if (data == n.data) {
-			if (n.left == null && n.right == null) {
-				return null;
-			} 
-			if (n.left == null) {
-				return n.right;
-			}
-			if (n.right == null) {
-				return n.left; 	
-			}
-		} else if (data < n.data) {
-			this.removeNode(n.left, data);
+		if (node == null) return null;
+
+		if (data == node.data) {
+			
+			if (node.left == null && node.right == null) return null;	
+			if (node.left == null) return node.right;
+			if (node.right == null) return node.left;
+
+			// 둘다 있는 경우
+			var tempNode = this.getSmallestNode(node.right);
+			node.data = tempNode.data;
+			node.right = this.removeNode(node.right, tempNode.data);
+			return node;
+
+		} else if (data < node.data) {
+			node.left = this.removeNode(node.left, data); // 이해하기 어려운 파트
+			return node;
 		} else {
-			this.removeNode(n.right, data);
+			node.right = this.removeNode(node.right, data);
+			return node;
 		}
-
-		// return ret;
+	},
+	getSmallestNode: function(node) {
+		while(node.left !== null) {
+			node = node.left;
+		}
+		return node;
+	},
+	findInOrder: function(node, cb) {
+		if ( node !== null ) {
+			this.findInOrder(node.left, cb);
+			cb(node);
+			this.findInOrder(node.right, cb);
+		}
+	},
+	toArray: function() {
+		var arr = [];
+		this.findInOrder(this.root, function(node) {
+			arr.push(node.data);
+		});
+		return arr;
 	}
 };
 
 function inOrder(node) {
-	if (!(node == null)) {
+	if ( node !== null ) {
 		inOrder(node.left);
 		console.log(node.show() + ' ');
 		inOrder(node.right);
 	}
 };
 
-var nums = BST.of();
-nums.insert(50); 
-nums.insert(48); 
-nums.insert(80); 
-nums.insert(24);
-nums.insert(56); 
-nums.insert(21);
-nums.insert(28); 
-nums.insert(53);
-nums.insert(59);
-nums.insert(70);
-nums.insert(60);
-nums.insert(75);
-nums.insert(90);
-nums.insert(100);
-nums.insert(23);
-nums.insert(27);
-inOrder(nums.root);
-// console.log('parent', nums.findParent(21).data);
-nums.remove2(28);
-var min = nums.getMin();
-var max = nums.getMax();
-console.log('the minimum value of the BST is: ' + min);
-console.log('the maximum value of the BST is: ' + max);
+var makeArray = function(num) {
+	var arr = [];
+	for (var i = 1; i < num + 1; i++) {
+		arr.push(i);
+	}
+	arr.shuffle();
+	console.log('shuffled: ', arr);
+	return arr;
+};
+
+var dummyArray = makeArray(20000);
+
+console.time('makeBST');
+var nums = BST.of(dummyArray);
+console.log('root', nums.root.data);
+console.timeEnd('makeBST');
+
+console.time('getMin');
+nums.getMin();
+console.timeEnd('getMin');
+
+
 
