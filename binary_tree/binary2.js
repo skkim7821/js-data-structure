@@ -13,6 +13,7 @@ function Node(data, left, right) {
 	this.data = data;
 	this.left = left;
 	this.right = right;
+	this.count = 1;
 	this.show = function() {
 		return this.data;
 	}
@@ -65,6 +66,8 @@ BST.prototype = {
 		});
 	},
 	find: function(data) {
+		if (this.root == undefined) return null; 
+
 		var x = this.root;
 		while (x.data !== data) {
 			data < x.data ? x = x.left : x = x.right;
@@ -90,6 +93,11 @@ BST.prototype = {
 		var len = arr.length;
 		if (len % 2 == 0) return arr[len / 2];
 		return arr[(len - 1) / 2];
+	},
+	incCount: function(data) {
+		var item = this.find(data);
+		item.count++;
+		return item;
 	},
 	remove: function(data) {
 		this.root = this.removeNode(this.root, data);
@@ -137,6 +145,14 @@ BST.prototype = {
 			arr.push(node.data);
 		});
 		return arr;
+	},
+	length: function() {
+		return this.toArray().length;
+	},
+	update: function(data) {
+		var node = this.find(data);
+		node.count++;
+		return node;
 	}
 };
 
@@ -154,20 +170,57 @@ var makeArray = function(num) {
 		arr.push(i);
 	}
 	arr.shuffle();
-	console.log('shuffled: ', arr);
+	// console.log('shuffled: ', arr);
 	return arr;
 };
 
-var dummyArray = makeArray(20000);
+var prArray = function(arr) {
+	var str = '';
+	str += arr[0].toString() + ' ';
+	for (var i = 1; i < arr.length; i++) {
+		str += arr[i].toString() + ' ';
+		if (1 % 10 == 0) {
+			str += '\n';
+		}
+	}
+	console.log(str);
+};
 
-console.time('makeBST');
-var nums = BST.of(dummyArray);
-console.log('root', nums.root.data);
-console.timeEnd('makeBST');
+var genArray = function(length) {
+	var arr = [];
+	for (var i = 0; i < length; i++) {
+		arr[i] = Math.floor(Math.random() * 101);
+	}
+	return arr;
+};
 
-console.time('getMin');
-nums.getMin();
-console.timeEnd('getMin');
+var makeBST = function(arr) {
+	var bst = BST.of();
+	for (var i =0; i < arr.length; i++) {
+		var g = arr[i];
+		var found = bst.find(g);
+		found == null ? bst.insert(g) : bst.update(g);
+	}
+
+	return bst;
+};
+
+
+var grades = genArray(100);
+prArray( grades );
+var gradesBST = makeBST(grades);
+
+console.log('getMax',gradesBST.getMax());
+console.log('getMin',gradesBST.getMin());
+
+// console.time('makeBST');
+// var nums = BST.of(dummyArray);
+// console.log('root', nums.root.data);
+// console.timeEnd('makeBST');
+
+// console.time('getMin');
+// nums.getMin();
+// console.timeEnd('getMin');
 
 
 
