@@ -102,6 +102,7 @@ Graph.prototype = {
 		for (var i = 0; i < this.vertices; i++) {
 			visited[i] = false;
 		}
+		
 		for (var i = 0; i < this.vertices; i++) {
 			if (visited[i] == false) this.topSortHelper(i, visited, stack);
 		}

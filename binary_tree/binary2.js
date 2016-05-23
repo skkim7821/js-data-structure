@@ -38,14 +38,14 @@ BST.of = function(arr) {
 BST.prototype = {
 	insert: function(data) {
 		var n = Node.of(data, null, null);
-		this.root === null ? this.root = n : this.checkAndInsert(n, this.root);
+		this.root === null ? this.root = n : this.insertHelper(n, this.root);
 	}, 
-	checkAndInsert: function(n, t) {
+	insertHelper: function(n, t) {
 		var data = n.data;
 		if (data < t.data) { // left
-			t.left === null ? t.left = n : this.checkAndInsert(n, t.left);
+			t.left === null ? t.left = n : this.insertHelper(n, t.left);
 		} else { // right
-			t.right === null ? t.right = n : this.checkAndInsert(n, t.right);
+			t.right === null ? t.right = n : this.insertHelper(n, t.right);
 		}
 	},
 	build: function(arr) {

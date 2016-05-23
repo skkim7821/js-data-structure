@@ -78,20 +78,36 @@ CArray.prototype = {
 		}
 	},
 	shellSort: function() {
+		this.gaps.forEach(function(g) {
+			for (var i = g; i < this.dataStore.length; i++) {
 
+			}
+		})
 	},
 	mergeSort: function() {
 
 	},
-	qSort: function() {
-
+	doQSort: function() {
+		this.dataStore = this.qSort(this.dataStore);
+	},
+	qSort: function(list) {
+		if (list.length == 0) return [];
+		
+		var lesser = [];
+		var greater = [];
+		var pivot = list[0];
+		for (var i = 1; i < list.length; i++) {
+			list[i] < pivot ? lesser.push(list[i]) : greater.push(list[i]);
+		}
+		console.log(lesser, pivot, greater);
+		return this.qSort(lesser).concat(pivot, this.qSort(greater));
 	}
 };
 
-var numEls = 10;
+var numEls = 20;
 var myNums = CArray.of(numEls);
 myNums.setData();
 // console.log(myNums.toString());
-myNums.insertionSort();
+myNums.doQSort();
 console.log();
 console.log(myNums.toString());
